@@ -102,7 +102,7 @@ def pdfServe(request):
     list_return = []
 
     curDir = os.getcwd()
-    response = FileResponse(open(curDir + "/hello/static/images/pdfs/{}pdf.pdf".format(ABRV_table_name), 'rb'), content_type="application/pdf")
+    response = FileResponse(open(curDir + "/hello/static/images/pdfs/{}".format(ABRV_table_name), 'rb'), content_type="application/pdf")
     response["Content-Disposition"] = "filename={}".format(ABRV_table_name)
     return response
 
