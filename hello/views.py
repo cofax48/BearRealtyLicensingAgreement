@@ -25,6 +25,8 @@ def pdfEdit(request):
     data = json.loads(request.body.decode('utf-8'))
     print(data, '25')
     clientName = data["clientName"]
+    clientAddress = data["Address"]
+    clientNameAndAdress = clientName + ', ' + clientAddress
     print(clientName, '25')
 
     six_months_in_seconds = int(int(time.time()) + 15552000)
@@ -38,6 +40,10 @@ def pdfEdit(request):
     can = canvas.Canvas(packet, pagesize=letter)
     #First page of PDF
     can.setFont('Helvetica', 10)
+
+    can.drawString(96, 588, "{}".format(clientNameAndAdress))
+
+
     can.drawString(246, 394, "{}".format(todays_date))
     can.drawString(416, 394, "{}".format(six_months_from_now))
     can.save()
@@ -63,7 +69,7 @@ def pdfEdit(request):
 
     # read your existing PDF
     curDir = os.getcwd()
-    existing_pdf = PdfFileReader(open(curDir + "/hello/static/images/pdfs/EXR_Buyer_Broker_Agreement.pdf", "rb"))
+    existing_pdf = PdfFileReader(open(curDir + "/hello/static/images/pdfs/EXR_Buyer_Broker_AgreementSansComission.pdf", "rb"))
     output = PdfFileWriter()
     # add the "watermark" (which is the new pdf) on the existing page
     page = existing_pdf.getPage(0)

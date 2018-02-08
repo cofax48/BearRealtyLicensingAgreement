@@ -11,7 +11,7 @@ app.controller('Controller', function($scope, $http){
 
   $scope.Credentials = function (Name, Address, Email, PhoneNum) {
 
-    $scope.clientName = "../static/images/pdfs/" + String(Name) + "pdf.pdf";
+    $scope.clientName = "../hello/static/images/pdfs/" + String(Name) + "pdf.pdf";
     console.log($scope);
     console.log(Name, Address, Email, PhoneNum);
     var post_upload = {
