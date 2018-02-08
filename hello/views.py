@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.http import FileResponse
+from django.views.decorators.csrf import csrf_exempt
 
 
 import json
@@ -18,7 +19,7 @@ def index(request):
     # return HttpResponse('Hello from Python!')
     return render(request, 'index.html')
 
-
+@csrf_exempt
 def pdfEdit(request):
 
     data = json.loads(request.body.decode('utf-8'))
@@ -87,6 +88,7 @@ def pdfEdit(request):
 
     return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
 
+@csrf_exempt
 def pdfServe(request):
     print(request)
     ABRV_table_name = str(request)[39:]
@@ -99,10 +101,11 @@ def pdfServe(request):
     list_return = []
 
     curDir = os.getcwd()
-    response = FileResponse(open(curDir + "/hello/static/images/pdfs/{}".format(ABRV_table_name), 'rb'), content_type="application/pdf")
+    response = FileResponse(open(curDir + "/hello/static/images/pdfs/{}pdf.pdf".format(ABRV_table_name), 'rb'), content_type="application/pdf")
     response["Content-Disposition"] = "filename={}".format(ABRV_table_name)
     return response
 
+@csrf_exempt
 def signatureCapture(request):
 
     #Gets the name of the most recent pdf created-does not scale
