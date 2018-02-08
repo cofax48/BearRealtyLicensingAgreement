@@ -186,7 +186,7 @@ def SignedAgreement(request):
     list_return = []
 
     curDir = os.getcwd()
-    response_adrress = curDir + "/hello/static/images/pdfs/{}".format(ABRV_table_name)
+    response_adrress = curDir + "/hello/static/images/pdfs/{}SignedAgreement.pdf".format(ABRV_table_name)
     print(response_adrress, '106')
     response = FileResponse(open(response_adrress, 'rb'), content_type="application/pdf")
     response["Content-Disposition"] = "filename={}".format(ABRV_table_name)
