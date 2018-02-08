@@ -14,6 +14,13 @@ import time
 import os
 import base64
 
+#email stuff
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
+
 # Create your views here.
 def index(request):
     # return HttpResponse('Hello from Python!')
@@ -26,6 +33,8 @@ def pdfEdit(request):
     print(data, '25')
     clientName = data["clientName"]
     clientAddress = data["Address"]
+    clientEmail = "Email: " + str(data["Email"])
+    clientPhoneNumber = "Phone Number: " + data["PhoneNum"]
     clientNameAndAdress = clientName + ', ' + clientAddress
     print(clientName, '25')
 
@@ -57,6 +66,10 @@ def pdfEdit(request):
     can4.drawString(416, 398, "{}".format("Will Bear"))
     can4.drawString(125, 360, "{}".format(todays_date))
     can4.drawString(406, 360, "{}".format(todays_date))
+    can4.drawString(100, 320, "{}".format(clientEmail))
+    can4.drawString(390, 320, "{}".format(clientPhoneNumber))
+
+
     can4.save()
 
     # move to the beginning of the StringIO buffer
@@ -91,7 +104,7 @@ def pdfEdit(request):
     outputStream = open(real_file_address, "wb")
     output.write(outputStream)
     outputStream.close()
-    print(real_file_address, 'output complte 88')
+    print(real_file_address, 'output complte 101')
 
     return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
 
@@ -176,6 +189,42 @@ def signatureCapture(request):
     #Removes the previously edited pdf and signature
     os.remove(curDir + "/hello/static/images/pdfs/{}pdf.pdf".format(sigName))
     os.remove(curDir + '/hello/static/images/pdfs/{}Signature.png'.format(sigName))
+
+    ###################
+    #Email Stuff
+    #################
+
+    fromaddr = "joshwillrealtyproductions@gmail.com"
+    toaddr = "redcupnyc@gmail.com"
+
+    msg = MIMEMultipart()
+
+    msg['From'] = fromaddr
+    msg['To'] = toaddr
+    msg['Subject'] = "Agreement With: {}".format(sigName)
+
+    body = "Licensing Agreement From: {}".format(sigName)
+
+    msg.attach(MIMEText(body, 'plain'))
+
+    FileNameToUSe = sigName.replace(' ', '_', 3)
+
+    filename = "{}SignedAgreement.pdf".format(FileNameToUSe)
+    attachment = open(curDir + "/hello/static/images/pdfs/{}SignedAgreement.pdf".format(sigName), "rb")
+
+    part = MIMEBase('application', 'octet-stream')
+    part.set_payload((attachment).read())
+    encoders.encode_base64(part)
+    part.add_header('Content-Disposition', "attachment; filename= %s" % filename)
+
+    msg.attach(part)
+
+    server = smtplib.SMTP('smtp.gmail.com', 587)
+    server.starttls()
+    server.login(fromaddr, "JoshAndWill2018")
+    text = msg.as_string()
+    server.sendmail(fromaddr, toaddr, text)
+    server.quit()
     print('170')
 
     return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
