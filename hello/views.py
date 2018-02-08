@@ -173,3 +173,21 @@ def signatureCapture(request):
     print('170')
 
     return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
+
+@csrf_exempt
+def SignedAgreement(request):
+    ABRV_table_name = str(request)[36:]
+    ABRV_table_name = ABRV_table_name[:-2]
+    ABRV_table_name != 'favicon.ico'
+    ABRV_table_name != '/favicon.ico'
+    ABRV_table_name = ABRV_table_name.replace('%20', ' ', 3)
+
+    print(ABRV_table_name)
+    list_return = []
+
+    curDir = os.getcwd()
+    response_adrress = curDir + "/hello/static/images/pdfs/{}".format(ABRV_table_name)
+    print(response_adrress, '106')
+    response = FileResponse(open(response_adrress, 'rb'), content_type="application/pdf")
+    response["Content-Disposition"] = "filename={}".format(ABRV_table_name)
+    return response

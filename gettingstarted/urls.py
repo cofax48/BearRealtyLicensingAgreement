@@ -15,5 +15,6 @@ urlpatterns = [
     url(r'^pdfEdit', hello.views.pdfEdit, name='pdfEdit'),
     url(r'^signatureCapture', hello.views.signatureCapture, name='signatureCapture'),
     url(r'^hello/static/images/pdfs/\w{2,40}', hello.views.pdfServe, name='pdfServe'),
+    url(r'^SignedAgreement/\w{2,40}', hello.views.SignedAgreement, name='SignedAgreement'),    
     path('admin/', admin.site.urls),
 ]
