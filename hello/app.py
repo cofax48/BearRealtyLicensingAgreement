@@ -1,8 +1,6 @@
-from django.shortcuts import render
-from django.http import HttpResponse
-from django.http import FileResponse
-
-
+# app.py
+from flask import Flask
+from flask import request, render_template, jsonify
 import json
 from PyPDF2 import PdfFileWriter, PdfFileReader
 import io
@@ -13,18 +11,19 @@ import time
 import os
 import base64
 
-# Create your views here.
-def index(request):
-    # return HttpResponse('Hello from Python!')
-    return render(request, 'index.html')
 
+app = Flask(__name__)
 
-def pdfEdit(request):
+#Homepage
+@app.route("/")
+def homepage():
+    return render_template("index.html")
 
-    data = json.loads(request.body.decode('utf-8'))
-    print(data, '25')
+@app.route("/pdfEdit", methods=['POST'])
+def pdfEdit():
+
+    data = json.loads(request.data.decode())
     clientName = data["clientName"]
-    print(clientName, '25')
 
     six_months_in_seconds = int(int(time.time()) + 15552000)
     todays_date = datetime.fromtimestamp(int(time.time())).strftime('%B-%d-%Y')
@@ -61,8 +60,7 @@ def pdfEdit(request):
     new_pdf4 = PdfFileReader(packet2)
 
     # read your existing PDF
-    curDir = os.getcwd()
-    existing_pdf = PdfFileReader(open(curDir + "/hello/static/images/pdfs/EXR_Buyer_Broker_Agreement.pdf", "rb"))
+    existing_pdf = PdfFileReader(open("EXR_Buyer_Broker_Agreement.pdf", "rb"))
     output = PdfFileWriter()
     # add the "watermark" (which is the new pdf) on the existing page
     page = existing_pdf.getPage(0)
@@ -81,44 +79,29 @@ def pdfEdit(request):
 
 
     # finally, write "output" to a real file
-    outputStream = open(curDir + "/hello/static/images/pdfs/{}pdf.pdf".format(clientName), "wb")
+    curDir = os.getcwd()
+    outputStream = open(curDir + "/static/images/pdfs/{}pdf.pdf".format(clientName), "wb")
     output.write(outputStream)
     outputStream.close()
 
     return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
 
-def pdfServe(request):
-    print(request)
-    ABRV_table_name = str(request)[39:]
-    ABRV_table_name = ABRV_table_name[:-2]
-    ABRV_table_name != 'favicon.ico'
-    ABRV_table_name != '/favicon.ico'
-    ABRV_table_name = ABRV_table_name.replace('%20', ' ', 3)
 
-    print(ABRV_table_name)
-    list_return = []
-
-    curDir = os.getcwd()
-    response = FileResponse(open(curDir + "/hello/static/images/pdfs/{}pdf.pdf".format(ABRV_table_name), 'rb'), content_type="application/pdf")
-    response["Content-Disposition"] = "filename={}".format(ABRV_table_name)
-    return response
-
-def signatureCapture(request):
-
+@app.route("/signatureCapture", methods=['POST'])
+def signatureCapture():
     #Gets the name of the most recent pdf created-does not scale
-    from hello.static.images.pdfs.Most_recent_file_return_prog import return_most_recent_file
-
+    from static.images.pdfs.Most_recent_file_return_prog import return_most_recent_file
 
     #bytes of images
-    sigData = request.body
+    sigData = request.data
     sigString = sigData[22:]
+    print(sigData[22:])
     #sigDataToUSE = decode_base64(sigData)
     #print(sigDataToUSE)
     sigName = return_most_recent_file()
 
-    curDir = os.getcwd()
     #saves new image
-    with open(curDir + "/hello/static/images/pdfs/{}Signature.png".format(sigName), "wb") as fh:
+    with open("{}Signature.png".format(sigName), "wb") as fh:
         fh.write(base64.decodebytes(sigString))
 
     #initialize new stream
@@ -127,7 +110,7 @@ def signatureCapture(request):
     # create a new PDF with Reportlab
     can4 = canvas.Canvas(packet2, pagesize=letter)
     #Fourth Page of PDF
-    can4.drawImage(curDir + '/hello/static/images/pdfs/{}Signature.png'.format(sigName), 55, 430, 240, 46, mask='auto') ## at (15, 320) with size 160x160
+    can4.drawImage('{}Signature.png'.format(sigName), 55, 430, 240, 46, mask='auto') ## at (15, 320) with size 160x160
     can4.save()
 
 
@@ -136,7 +119,8 @@ def signatureCapture(request):
     new_pdf4 = PdfFileReader(packet2)
 
     # read your existing PDF
-    existing_pdf = PdfFileReader(open(curDir + "/hello/static/images/pdfs/{}pdf.pdf".format(sigName), "rb"))
+    curDir = os.getcwd()
+    existing_pdf = PdfFileReader(open(curDir + "/static/images/pdfs/{}pdf.pdf".format(sigName), "rb"))
     output = PdfFileWriter()
     # add the "watermark" (which is the new pdf) on the existing page
     page = existing_pdf.getPage(0)
@@ -155,13 +139,16 @@ def signatureCapture(request):
 
     # finally, write "output" to a real file
     curDir = os.getcwd()
-    outputStream = open(curDir + "/hello/static/images/pdfs/{}SignedAgreement.pdf".format(sigName), "wb")
+    outputStream = open(curDir + "/static/images/pdfs/{}SignedAgreement.pdf".format(sigName), "wb")
     output.write(outputStream)
     outputStream.close()
 
     #Removes the previously edited pdf and signature
-    os.remove(curDir + "/hello/static/images/pdfs/{}pdf.pdf".format(sigName))
-    os.remove(curDir + '/hello/static/images/pdfs/{}Signature.png'.format(sigName))
+    os.remove(curDir + "/static/images/pdfs/{}pdf.pdf".format(sigName))
+    os.remove(curDir + '/{}Signature.png'.format(sigName))
 
 
     return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
+
+if __name__ == '__main__':
+    app.run(debug=True)

@@ -12,6 +12,8 @@ import hello.views
 
 urlpatterns = [
     url(r'^$', hello.views.index, name='index'),
-    url(r'^db', hello.views.db, name='db'),
+    url(r'^pdfEdit', hello.views.pdfEdit, name='pdfEdit'),
+    url(r'^signatureCapture', hello.views.signatureCapture, name='signatureCapture'),
+    url(r'^static/images/pdfs/\w{2,40}', hello.views.pdfServe, name='pdfServe'),
     path('admin/', admin.site.urls),
 ]
