@@ -80,12 +80,12 @@ def pdfEdit(request):
     output.addPage(page3)
     output.addPage(page4)
 
-
+    real_file_address = curDir + "/hello/static/images/pdfs/{}pdf.pdf".format(clientName)
     # finally, write "output" to a real file
-    outputStream = open(curDir + "/hello/static/images/pdfs/{}pdf.pdf".format(clientName), "wb")
+    outputStream = open(real_file_address, "wb")
     output.write(outputStream)
     outputStream.close()
-    print(clientName, 'output complte 88')
+    print(real_file_address, 'output complte 88')
 
     return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
 
@@ -102,7 +102,9 @@ def pdfServe(request):
     list_return = []
 
     curDir = os.getcwd()
-    response = FileResponse(open("/hello/static/images/pdfs/{}".format(ABRV_table_name), 'rb'), content_type="application/pdf")
+    response_adrress = curDir + "/hello/static/images/pdfs/{}".format(ABRV_table_name)
+    print(response_adrress, '106')
+    response = FileResponse(open(response_adrress, 'rb'), content_type="application/pdf")
     response["Content-Disposition"] = "filename={}".format(ABRV_table_name)
     return response
 
