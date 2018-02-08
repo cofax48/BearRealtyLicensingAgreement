@@ -92,7 +92,8 @@ def pdfEdit(request):
 @csrf_exempt
 def pdfServe(request):
     print(request)
-    ABRV_table_name = str(request)[45:]
+    time.sleep(5)
+    ABRV_table_name = str(request)[49:]
     ABRV_table_name = ABRV_table_name[:-2]
     ABRV_table_name != 'favicon.ico'
     ABRV_table_name != '/favicon.ico'
@@ -110,7 +111,7 @@ def pdfServe(request):
 
 @csrf_exempt
 def signatureCapture(request):
-
+    time.sleep(5)
     print('112')
     #Gets the name of the most recent pdf created-does not scale
     from hello.static.images.pdfs.Most_recent_file_return_prog import return_most_recent_file
