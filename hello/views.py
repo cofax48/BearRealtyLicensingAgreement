@@ -85,13 +85,14 @@ def pdfEdit(request):
     outputStream = open(curDir + "/hello/static/images/pdfs/{}pdf.pdf".format(clientName), "wb")
     output.write(outputStream)
     outputStream.close()
+    print(clientName, 'output complte 88')
 
     return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
 
 @csrf_exempt
 def pdfServe(request):
     print(request)
-    ABRV_table_name = str(request)[39:]
+    ABRV_table_name = str(request)[45:]
     ABRV_table_name = ABRV_table_name[:-2]
     ABRV_table_name != 'favicon.ico'
     ABRV_table_name != '/favicon.ico'
@@ -108,6 +109,7 @@ def pdfServe(request):
 @csrf_exempt
 def signatureCapture(request):
 
+    print('112')
     #Gets the name of the most recent pdf created-does not scale
     from hello.static.images.pdfs.Most_recent_file_return_prog import return_most_recent_file
 
@@ -165,6 +167,6 @@ def signatureCapture(request):
     #Removes the previously edited pdf and signature
     os.remove(curDir + "/hello/static/images/pdfs/{}pdf.pdf".format(sigName))
     os.remove(curDir + '/hello/static/images/pdfs/{}Signature.png'.format(sigName))
-
+    print('170')
 
     return json.dumps({'success':True}), 200, {'ContentType':'application/json'}
